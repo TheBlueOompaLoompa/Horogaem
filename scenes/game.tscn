@@ -1,0 +1,132 @@
+[gd_scene load_steps=6 format=3 uid="uid://dedhdtrq4qc16"]
+
+[ext_resource type="Script" path="res://scripts/level_manager.gd" id="1_1we61"]
+[ext_resource type="Script" path="res://scripts/network_manager.gd" id="2_5qo8l"]
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="2_7p7ml"]
+[ext_resource type="PackedScene" uid="uid://bgf2f8xhe53ri" path="res://scenes/prefabs/player.tscn" id="2_27b75"]
+[ext_resource type="Script" path="res://scripts/lobby.gd" id="2_g0qf8"]
+
+[node name="Game" type="Node3D"]
+
+[node name="NetworkSpawn" type="Node3D" parent="."]
+
+[node name="Level Manager" type="Node3D" parent="." node_paths=PackedStringArray("net_spawn")]
+script = ExtResource("1_1we61")
+player = ExtResource("2_27b75")
+net_spawn = NodePath("../NetworkSpawn")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainer"]
+layout_mode = 2
+current_tab = 0
+tabs_visible = false
+
+[node name="MainMenu" type="CenterContainer" parent="PanelContainer/TabContainer" node_paths=PackedStringArray("network")]
+layout_mode = 2
+script = ExtResource("2_7p7ml")
+network = NodePath("../../../NetworkManager")
+metadata/_tab_index = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/MainMenu"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="NameLabel" type="Label" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Name"
+
+[node name="Name" type="LineEdit" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DirectLabel" type="Label" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Direct"
+
+[node name="CheckBox" type="CheckBox" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="KeyLabel" type="Label" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Key"
+
+[node name="Key" type="LineEdit" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MaxLabel" type="Label" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Players"
+
+[node name="Max" type="SpinBox" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 4095.0
+value = 20.0
+
+[node name="JoinButton" type="Button" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Join Game"
+
+[node name="CreateButton" type="Button" parent="PanelContainer/TabContainer/MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Create Server"
+
+[node name="Lobby" type="CenterContainer" parent="PanelContainer/TabContainer" node_paths=PackedStringArray("container", "start_game_button", "level_manager")]
+visible = false
+layout_mode = 2
+script = ExtResource("2_g0qf8")
+container = NodePath("VBoxContainer/ScrollContainer/VBoxContainer")
+start_game_button = NodePath("VBoxContainer/StartGame")
+level_manager = NodePath("../../../Level Manager")
+metadata/_tab_index = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/Lobby"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/TabContainer/Lobby/VBoxContainer"]
+layout_mode = 2
+text = "Players:"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/TabContainer/Lobby/VBoxContainer"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/TabContainer/Lobby/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="StartGame" type="Button" parent="PanelContainer/TabContainer/Lobby/VBoxContainer"]
+layout_mode = 2
+text = "Start Game"
+
+[node name="NetworkManager" type="Node" parent="." node_paths=PackedStringArray("tabs")]
+script = ExtResource("2_5qo8l")
+tabs = NodePath("../PanelContainer/TabContainer")
+rendevouz_port = 25565
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="NetworkManager"]
+_spawnable_scenes = PackedStringArray("res://scenes/prefabs/player.tscn")
+spawn_path = NodePath("../../NetworkSpawn")
+
+[connection signal="toggled" from="PanelContainer/TabContainer/MainMenu/VBoxContainer/GridContainer/CheckBox" to="PanelContainer/TabContainer/MainMenu" method="_on_check_box_toggled"]
+[connection signal="pressed" from="PanelContainer/TabContainer/MainMenu/VBoxContainer/JoinButton" to="PanelContainer/TabContainer/MainMenu" method="_on_join_button_pressed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/MainMenu/VBoxContainer/CreateButton" to="PanelContainer/TabContainer/MainMenu" method="_on_create_button_pressed"]
+[connection signal="visibility_changed" from="PanelContainer/TabContainer/Lobby" to="PanelContainer/TabContainer/Lobby" method="_on_visibility_changed"]
+[connection signal="pressed" from="PanelContainer/TabContainer/Lobby/VBoxContainer/StartGame" to="PanelContainer/TabContainer/Lobby" method="_on_start_game_pressed"]
+[connection signal="connected" from="NetworkManager" to="PanelContainer/TabContainer/MainMenu" method="_on_network_manager_connected"]
+[connection signal="hole_punched" from="NetworkManager" to="NetworkManager" method="_on_hole_punched"]
+[connection signal="players_changed" from="NetworkManager" to="PanelContainer/TabContainer/Lobby" method="_on_network_manager_players_changed"]
+[connection signal="session_registered" from="NetworkManager" to="NetworkManager" method="_on_session_registered"]

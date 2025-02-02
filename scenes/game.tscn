@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dedhdtrq4qc16"]
+[gd_scene load_steps=7 format=3 uid="uid://dedhdtrq4qc16"]
 
 [ext_resource type="Script" path="res://scripts/level_manager.gd" id="1_1we61"]
 [ext_resource type="Script" path="res://scripts/network_manager.gd" id="2_5qo8l"]
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="2_7p7ml"]
 [ext_resource type="PackedScene" uid="uid://bgf2f8xhe53ri" path="res://scenes/prefabs/player.tscn" id="2_27b75"]
 [ext_resource type="Script" path="res://scripts/lobby.gd" id="2_g0qf8"]
+[ext_resource type="Resource" uid="uid://drh6bsh8n5nxi" path="res://networkconfig.tres" id="6_uhsgn"]
 
 [node name="Game" type="Node3D"]
 
@@ -115,7 +116,7 @@ text = "Start Game"
 [node name="NetworkManager" type="Node" parent="." node_paths=PackedStringArray("tabs")]
 script = ExtResource("2_5qo8l")
 tabs = NodePath("../PanelContainer/TabContainer")
-rendevouz_port = 25565
+network_config = ExtResource("6_uhsgn")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="NetworkManager"]
 _spawnable_scenes = PackedStringArray("res://scenes/prefabs/player.tscn")
